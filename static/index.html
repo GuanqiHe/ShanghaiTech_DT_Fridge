@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+  <title>Fridge management service</title>
+
+  <!-- CSS  -->
+  <script type="text/javascript" src="./js/LabelPrintAPI-1.1.0.min.js"></script>
+  <script type="text/javascript" src="./js/jquery-3.5.1.min.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="./css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="./css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
+</head>
+
+
+<script>
+function autocomplete(){
+    var webcookies=document.cookie.split(';');
+    for (var i=0;i<webcookies.length;i++)
+    {
+        if(webcookies[i].indexOf("data=")==0)
+        {
+            data=webcookies[i].substring("data=".length,webcookies[i].length);
+            data=JSON.parse(data);
+            document.getElementById("icon_prefix").value=data['user'];
+            document.getElementById("icon_room").value=data['room'];
+            document.getElementById("icon_time").value=data['time'];
+            document.getElementById("icon_telephone").value=data['tele'];
+        }
+    }
+}
+function check()
+{
+       var name = document.getElementById("icon_prefix").value;
+       var room = document.getElementById("icon_room").value;
+       var time = document.getElementById("icon_time").value;
+       var tele = document.getElementById("icon_telephone").value;
+       var reg= /^[\u4E00-\u9FA5]{1,5}$/;
+       var numreg=/^\+?[1-9][0-9]*$/;
+       var test=0;
+       if(name.length<2 || name.length>4 ||!reg.test(name) )
+       {
+           alert("请填写真实姓名");
+           return 0;
+       }
+       if(!numreg.test(room))
+       {
+           alert("请填写寝室号");
+           return 0;
+       }
+       /*
+       if(!numreg.test(tele)||tele[0]!='1')
+       {
+           alert("请填写联系方式");
+           return 0;
+       }*/
+       
+return 1;
+}
+
+function printText() {
+    if(!check()){return;}
+    var name = document.getElementById("icon_prefix").value;
+    var room = document.getElementById("icon_room").value;
+    var time = document.getElementById("icon_time").value;
+    var tele = document.getElementById("icon_telephone").value;
+    var jsonobj = { 'user': name, 'room': room,'time':time,'tele':tele };
+    $(document).ready(function () {
+      $.ajax({
+        type: "POST",
+        url:"http://39.101.181.159/data/",
+        contentType: "application/json",
+        data: JSON.stringify(jsonobj),
+        success: function (data) {
+          alert("正在打印")
+        },
+        error:function (data){
+            alert("打印失败")
+        }
+      })
+    })
+    var expiresdate=new Date();
+    expiresdate.setTime(expiresdate.getTime()+(60*24*60*60*1000))
+    document.cookie="data="+JSON.stringify(jsonobj)+";expires="+expiresdate.toUTCString()+";path=/";
+    
+  }
+</script>
+
+
+
+<body>
+
+
+  <nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">FRIDGE</a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="#">admin</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="side-nav">
+        <li><a href="#">admin</a></li>
+      </ul>
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h1 class="header center orange-text">标签打印</h1>
+      <div class="row center">
+        <h5 class="header col s12 light">请在下面的提示框中输入信息，并按下打印按钮即可。</h5>
+      </div>
+      <div class="row center">
+        <div class="row">
+          <form class="col s12">
+            <div class="row">
+              <div class="input-field col s6">
+                <i class="material-icons prefix">account_circle</i>
+                <input id="icon_prefix" type="text" class="validate">
+                <label for="icon_prefix">姓名</label>
+              </div>
+              <div class="input-field col s6">
+                <i class="material-icons prefix">recent_actors</i>
+                <input id="icon_room" type="tel" class="validate">
+                <label for="icon_room">寝室号</label>
+              </div>
+            </div>
+          </form>
+          <form class="col s12">
+            <div class="row">
+              <div class="input-field col s6">
+                <i class="material-icons prefix">today</i>
+                <input id="icon_time" type="date" class="datepicker">
+                <label for="icon_time">取物时间</label>
+              </div>
+              <div class="input-field col s6">
+                <i class="material-icons prefix">phone</i>
+                <input id="icon_telephone" type="tel" class="validate">
+                <label for="icon_telephone">联系方式</label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <a href="#" id="download-button" class="btn-large waves-effect waves-light orange"
+          onclick="printText()">Print</a>
+        <!-- <input type="button" value="打印文本" onclick="printText()"/> -->
+        <br><br>
+
+      </div>
+    </div>
+
+
+    <div class="container">
+      <div class="section">
+
+
+      </div>
+      <br><br>
+
+      <div class="section">
+
+      </div>
+    </div>
+
+    <footer class="page-footer orange">
+      <div class="container">
+        <div class="row">
+          <div class="col l6 s12">
+            <h5 class="white-text">我们的宗旨</h5>
+            <p class="grey-text text-lighten-4">多一事不如少一事</p>
+
+            <p class="grey-text text-lighten-4">多一事不如少一事</p>
+
+            <p class="grey-text text-lighten-4">不要好心办坏事</p>
+
+
+          </div>
+          <div class="col l3 s12">
+            <!-- <h5 class="white-text">Settings</h5>
+          <ul>
+            <li><a class="white-text" href="#!">Link 1</a></li>
+            <li><a class="white-text" href="#!">Link 2</a></li>
+            <li><a class="white-text" href="#!">Link 3</a></li>
+            <li><a class="white-text" href="#!">Link 4</a></li>
+          </ul> -->
+          </div>
+          <div class="col l3 s12">
+            <h5 class="white-text">Connect</h5>
+            <ul>
+              <li><a class="white-text" href="#!">2019级新生群</a></li>
+              <li><a class="white-text" href="#!">公共服务处</a></li>
+              <li><a class="white-text" href="#!">团委</a></li>
+              <li><a class="white-text" href="https://www.geekpie.club">GeekPie Association</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <div class="container">
+          Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a> and Modified by
+          <a class="orange-text text-lighten-3" href="https://github.com/nyovelt">nyovelt</a>
+          Version: 2020/7/22.2
+        </div>
+      </div>
+    </footer>
+
+
+    <!--  Scripts-->
+    <script src="./js/materialize.js"></script>
+    <script src="./js/init.js"></script>
+    <script>autocomplete();</script>
+</body>
+
+
+
+
+</html>
